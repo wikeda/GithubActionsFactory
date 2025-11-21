@@ -77,19 +77,17 @@ const UI = {
     },
 
     showScreen: function (screenId) {
-        ['top-screen', 'map-screen', 'gameScreen'].forEach(id => {
+        ['top-screen', 'map-screen', 'game-screen'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.classList.remove('active', 'hidden');
-            if (el) el.classList.add('hidden');
+            if (!el) return;
+            el.classList.add('hidden');
+            el.classList.remove('active');
         });
 
-        // Special handling for gameScreen variable name vs id
-        if (screenId === 'game-screen') {
-            this.elements.gameScreen.classList.remove('hidden');
-            this.elements.gameScreen.classList.add('active');
-        } else {
-            document.getElementById(screenId).classList.remove('hidden');
-            document.getElementById(screenId).classList.add('active');
+        const target = document.getElementById(screenId);
+        if (target) {
+            target.classList.remove('hidden');
+            target.classList.add('active');
         }
     },
 
