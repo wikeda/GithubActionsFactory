@@ -82,6 +82,15 @@ body {
     color: var(--text-primary);
 }
 
+.logo.clickable {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.logo.clickable:hover {
+    opacity: 0.7;
+}
+
 /* Game Board */
 .game-board {
     flex: 1;

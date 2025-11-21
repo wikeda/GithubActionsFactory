@@ -74,6 +74,22 @@ const UI = {
         this.elements.btnMapGlossary.addEventListener('click', () => {
             this.elements.glossaryModal.classList.remove('hidden');
         });
+
+        // ホームボタン（新規追加）
+        const btnHome = document.getElementById('btn-home');
+        if (btnHome) {
+            btnHome.addEventListener('click', () => {
+                this.showScreen('top-screen');
+            });
+        }
+
+        // ロゴクリックでTOP画面に遷移（新規追加）
+        const logoHome = document.getElementById('logo-home');
+        if (logoHome) {
+            logoHome.addEventListener('click', () => {
+                this.showScreen('top-screen');
+            });
+        }
     },
 
     showScreen: function (screenId) {
