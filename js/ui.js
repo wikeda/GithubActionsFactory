@@ -228,9 +228,10 @@ const UI = {
             this.elements.slotsContainer.appendChild(slot);
         }
 
-        // Render Palette
+        // Render Palette (randomize order each time)
         this.elements.blocksPalette.innerHTML = '';
-        level.availableBlocks.forEach(blockId => {
+        const paletteBlocks = this.shuffleArray(level.availableBlocks);
+        paletteBlocks.forEach(blockId => {
             const blockData = BLOCKS[blockId];
             if (blockData) {
                 const block = this.createBlockElement(blockData);
@@ -323,6 +324,18 @@ const UI = {
     getPipelineConfig: function () {
         const slots = Array.from(this.elements.slotsContainer.children);
         return slots.map(slot => slot.dataset.blockId).filter(id => id !== undefined && id !== '');
+    },
+
+    /**
+     * Return a shuffled copy of an array (Fisher-Yates)
+     */
+    shuffleArray: function (arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
     },
 
     /**
