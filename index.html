@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Actions Factory</title>
+    <meta name="description" content="Learn GitHub Actions through a puzzle game.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/components.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Top Screen -->
+        <section id="top-screen" class="screen active">
+            <div class="hero-content">
+                <div class="logo-large">🏭 Actions Factory</div>
+                <p class="hero-desc">
+                    GitHub Actionsの仕組みをパズル感覚で学べるゲームです。<br>
+                    ブロックを組み合わせて、正しいCI/CDパイプラインを構築しましょう。
+                </p>
+                <div class="learning-points">
+                    <h3>学べること:</h3>
+                    <ul>
+                        <li>Workflowの基本構造</li>
+                        <li>JobとStepの順序関係</li>
+                        <li>環境構築と依存関係</li>
+                        <li>アーティファクトの管理</li>
+                    </ul>
+                </div>
+                <button id="btn-start-game" class="btn primary large">ゲームを始める</button>
+            </div>
+        </section>
+
+        <!-- Map Screen -->
+        <section id="map-screen" class="screen hidden">
+            <header class="header">
+                <div class="logo">
+                    <span class="icon">🏭</span>
+                    <h1>Level Map</h1>
+                </div>
+                <div class="header-controls">
+                    <button id="btn-show-stats" class="btn secondary">習熟度</button>
+                    <button id="btn-map-glossary" class="btn-icon" title="用語集">📚</button>
+                </div>
+            </header>
+            <div class="map-container" id="level-map">
+                <!-- Level nodes injected by JS -->
+            </div>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="game-screen" class="screen hidden">
+            <header class="header">
+                <div class="header-left">
+                    <button id="btn-back-map" class="btn-icon" title="マップに戻る">←</button>
+                    <div class="logo">
+                        <h1>Actions Factory</h1>
+                    </div>
+                </div>
+                <div class="level-info">
+                    <span class="label">LEVEL</span>
+                    <span id="level-display" class="value">01</span>
+                    <span id="level-title" class="title">Hello Workflow</span>
+                </div>
+                <div class="header-controls">
+                    <button id="btn-glossary" class="btn-icon" title="用語集">📚</button>
+                    <button id="btn-settings" class="btn-icon" title="設定">⚙️</button>
+                </div>
+            </header>
+
+            <main class="game-board">
+                <!-- パイプラインエリア（ドロップゾーン） -->
+                <section class="pipeline-area">
+                    <div class="pipeline-header">
+                        <h2>Workflow Pipeline</h2>
+                        <div class="status-badge" id="pipeline-status">READY</div>
+                    </div>
+                    <div class="conveyor-belt" id="conveyor-belt">
+                        <!-- スタート地点 -->
+                        <div class="node start-node">
+                            <div class="node-icon">🚀</div>
+                            <div class="node-label">on: push</div>
+                        </div>
+
+                        <!-- スロット（JSで生成） -->
+                        <div class="slots-container" id="slots-container">
+                            <!-- Slots will be injected here -->
+                        </div>
+
+                        <!-- ゴール地点 -->
+                        <div class="node end-node">
+                            <div class="node-icon">📦</div>
+                            <div class="node-label">Artifact</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- コンソールエリア -->
+                <section class="console-area">
+                    <div class="console-header">
+                        <span class="tab active">Console Output</span>
+                    </div>
+                    <div class="console-content" id="console-content">
+                        <div class="log-line system">> Ready to build. Waiting for workflow configuration...</div>
+                    </div>
+                </section>
+
+                <!-- ブロックパレットエリア -->
+                <section class="palette-area">
+                    <div class="palette-header">
+                        <h2>Available Actions</h2>
+                        <p class="hint-text">Drag blocks to the pipeline above</p>
+                    </div>
+                    <div class="blocks-container" id="blocks-palette">
+                        <!-- Blocks will be injected here -->
+                    </div>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <div class="controls">
+                    <button id="btn-reset" class="btn secondary">Reset</button>
+                    <button id="btn-run" class="btn primary">
+                        <span class="icon">▶</span> Commit & Push
+                    </button>
+                </div>
+            </footer>
+        </section>
+    </div>
+
+    <!-- モーダル類 -->
+    <div id="glossary-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>GitHub Actions Glossary</h2>
+                <button class="btn-close">×</button>
+            </div>
+            <div class="modal-body" id="glossary-content">
+                <!-- 用語集コンテンツ -->
+            </div>
+        </div>
+    </div>
+
+    <div id="stats-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>プレイ習熟度</h2>
+                <button class="btn-close">×</button>
+            </div>
+            <div class="modal-body" id="stats-content">
+                <!-- 統計コンテンツ -->
+            </div>
+        </div>
+    </div>
+
+    <div id="level-complete-modal" class="modal hidden">
+        <div class="modal-content success-content">
+            <div class="success-icon">✅</div>
+            <h2>Build Passing!</h2>
+            <div class="explanation-box">
+                <h3>解説</h3>
+                <p id="level-explanation-text">
+                    <!-- 解説テキスト -->
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-back-to-map" class="btn secondary">マップに戻る</button>
+                <button id="btn-next-level" class="btn primary">次のレベルへ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/glossary.js"></script>
+    <script src="js/blocks.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
