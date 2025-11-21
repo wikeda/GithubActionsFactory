@@ -348,8 +348,8 @@ const UI = {
         const stats = Storage.load().stats || {};
         const attempts = stats[level.id]?.attempts || 0;
 
-        if (attempts === 0) return; // 初回はヒントなし
-        if (attempts === 1) {
+        if (attempts <= 1) return; // 初回（attempts=1）まではヒントなし
+        if (attempts === 2) {
             this.log('HINT (soft): 順序と依存関係に気をつけて組み立ててみましょう。', 'warning');
             return;
         }
