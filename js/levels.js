@@ -10,7 +10,7 @@ const LEVELS = [
         description: 'まずは基本から。ソースコードを取得してテストを実行しましょう。',
         slots: 2,
         availableBlocks: ['checkout', 'npm-test'],
-        requiredBlocks: ['checkout', 'npm-test'], // 順序はGameロジックでチェック
+        requiredBlocks: ['checkout', 'npm-test'],
         solution: ['checkout', 'npm-test'],
         hint: 'まずは `Checkout` でコードを持ってこないと何も始まりません。',
         explanation: 'GitHub Actionsでは、まずリポジトリからコードを取得する `Checkout` が必要です。その後に `Test` を実行することで、コードが正しく動作するかを確認できます。この順序が逆だと、テストするコードがないためエラーになります。'
@@ -37,15 +37,191 @@ const LEVELS = [
         hint: 'テストは必須ではありませんが、ビルドの前にテストを入れるのが良い習慣です（このレベルでは省略可）。',
         explanation: 'ビルド（`npm build`）によって生成されたファイル（アーティファクト）は、ジョブが終了すると消えてしまいます。`Upload Artifact` を使うことで、ビルド成果物を保存し、後でダウンロードしたりデプロイに使ったりできるようになります。'
     },
-    // 追加のレベル案
-    /*
     {
         id: 4,
-        title: 'Docker Container',
-        description: 'Dockerイメージを作ってみましょう。',
-        slots: 2,
-        availableBlocks: ['checkout', 'docker-build', 'npm-test'],
-        solution: ['checkout', 'docker-build']
+        title: 'Lint & Test',
+        description: 'Lintとテストを順に走らせて品質を担保します。',
+        slots: 5,
+        availableBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-lint', 'npm-test'],
+        requiredBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-lint', 'npm-test'],
+        solution: ['checkout', 'setup-node', 'npm-install', 'npm-lint', 'npm-test'],
+        hint: '依存を入れてからLint→Testの順で流します。',
+        explanation: 'Lintで静的なコード規約違反を先に潰し、その後でテストを実行するのが定番の順序です。'
+    },
+    {
+        id: 5,
+        title: 'Cache Dependencies',
+        description: 'キャッシュを使って依存インストールを高速化しましょう。',
+        slots: 5,
+        availableBlocks: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-test'],
+        requiredBlocks: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-test'],
+        solution: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-test'],
+        hint: 'セットアップ→キャッシュ→インストール→テスト。',
+        explanation: 'Nodeのセットアップ後にキャッシュを有効化すると、`npm install` が高速化できます。'
+    },
+    {
+        id: 6,
+        title: 'Coverage Upload',
+        description: 'テスト後にカバレッジをアップロードしましょう。',
+        slots: 6,
+        availableBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-test', 'coverage-upload', 'upload-artifact'],
+        requiredBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-test', 'coverage-upload'],
+        solution: ['checkout', 'setup-node', 'npm-install', 'npm-test', 'coverage-upload', 'upload-artifact'],
+        hint: 'テストの結果を使ってカバレッジをアップロードします。',
+        explanation: 'カバレッジの収集はテスト実行後にしかできません。成果物に含めればダウンロードもできます。'
+    },
+    {
+        id: 7,
+        title: 'Matrix Testing',
+        description: '複数環境でテストを並列実行して互換性を確認します。',
+        slots: 5,
+        availableBlocks: ['checkout', 'setup-node', 'npm-install', 'matrix-test'],
+        requiredBlocks: ['checkout', 'setup-node', 'npm-install', 'matrix-test'],
+        solution: ['checkout', 'setup-node', 'npm-install', 'matrix-test'],
+        hint: 'インストールまで終えてからマトリクステストを回します。',
+        explanation: 'マトリクス戦略はOSやNodeバージョンを変えてテストするのに便利です。'
+    },
+    {
+        id: 8,
+        title: 'Security Scan',
+        description: 'テスト前に脆弱性スキャンを入れて安全性を確認します。',
+        slots: 5,
+        availableBlocks: ['checkout', 'security-scan', 'setup-node', 'npm-install', 'npm-test'],
+        requiredBlocks: ['checkout', 'security-scan', 'setup-node', 'npm-install', 'npm-test'],
+        solution: ['checkout', 'security-scan', 'setup-node', 'npm-install', 'npm-test'],
+        hint: 'コードを取ってすぐスキャン、環境を作ってテストへ。',
+        explanation: 'スキャンは早い段階に入れることでリスクを速く検知できます。'
+    },
+    {
+        id: 9,
+        title: 'Docker Build',
+        description: 'Dockerイメージをビルドしてみましょう。',
+        slots: 3,
+        availableBlocks: ['checkout', 'docker-build'],
+        requiredBlocks: ['checkout', 'docker-build'],
+        solution: ['checkout', 'docker-build'],
+        hint: 'コード取得後にDocker Buildを実行。',
+        explanation: 'コンテナ化で環境差分を減らします。'
+    },
+    {
+        id: 10,
+        title: 'Push Container Image',
+        description: 'レジストリにログインしてイメージをプッシュします。',
+        slots: 4,
+        availableBlocks: ['checkout', 'docker-login', 'docker-build', 'docker-push'],
+        requiredBlocks: ['checkout', 'docker-login', 'docker-build', 'docker-push'],
+        solution: ['checkout', 'docker-login', 'docker-build', 'docker-push'],
+        hint: 'Login → Build → Push の順序を守りましょう。',
+        explanation: '認証後にイメージをビルドし、レジストリへプッシュする基本的な流れです。'
+    },
+    {
+        id: 11,
+        title: 'Deploy to Staging',
+        description: 'ビルド成果物を作り、ステージングにデプロイします。',
+        slots: 6,
+        availableBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-build', 'upload-artifact', 'deploy-staging'],
+        requiredBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-build', 'deploy-staging'],
+        solution: ['checkout', 'setup-node', 'npm-install', 'npm-build', 'upload-artifact', 'deploy-staging'],
+        hint: 'Buildした成果物をデプロイ前にアップロードしておくと便利です。',
+        explanation: 'ステージングデプロイでもビルド成果物を保存しておくと検証・ロールバックがしやすくなります。'
+    },
+    {
+        id: 12,
+        title: 'Approval for Production',
+        description: '本番デプロイ前に手動承認を挟みます。',
+        slots: 6,
+        availableBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-build', 'manual-approval', 'deploy-production'],
+        requiredBlocks: ['checkout', 'setup-node', 'npm-install', 'npm-build', 'manual-approval', 'deploy-production'],
+        solution: ['checkout', 'setup-node', 'npm-install', 'npm-build', 'manual-approval', 'deploy-production'],
+        hint: 'ビルド→承認→本番デプロイの順番。',
+        explanation: 'Protected environmentsや手動承認を挟むことで、安全な本番リリースフローを再現します。'
+    },
+    {
+        id: 13,
+        title: 'Reusable Workflow',
+        description: '共通化された再利用ワークフローを呼び出します。',
+        slots: 3,
+        availableBlocks: ['checkout', 'reusable-workflow'],
+        requiredBlocks: ['checkout', 'reusable-workflow'],
+        solution: ['checkout', 'reusable-workflow'],
+        hint: '共通処理は reusable workflow にまとめて呼び出します。',
+        explanation: '`workflow_call` を使うと繰り返し使うジョブを共通化できます。'
+    },
+    {
+        id: 14,
+        title: 'Concurrency & Notify',
+        description: '重複実行を防ぎつつ結果を通知します。',
+        slots: 5,
+        availableBlocks: ['checkout', 'concurrency-guard', 'setup-node', 'npm-test', 'notify-slack'],
+        requiredBlocks: ['checkout', 'concurrency-guard', 'setup-node', 'npm-test', 'notify-slack'],
+        solution: ['checkout', 'concurrency-guard', 'setup-node', 'npm-test', 'notify-slack'],
+        hint: 'ガード→テスト→通知の流れを意識しましょう。',
+        explanation: 'concurrencyで重複実行を防ぎ、完了時にSlackへ通知する構成です。'
+    },
+    {
+        id: 15,
+        title: 'Python Tests',
+        description: 'Pythonプロジェクトのテストパイプラインを作ります。',
+        slots: 5,
+        availableBlocks: ['checkout', 'setup-python', 'pip-install', 'pytest', 'upload-artifact'],
+        requiredBlocks: ['checkout', 'setup-python', 'pip-install', 'pytest'],
+        solution: ['checkout', 'setup-python', 'pip-install', 'pytest', 'upload-artifact'],
+        hint: 'Python環境を作って依存を入れ、pytestを流します。',
+        explanation: '言語が変わっても構造は同じ。環境→依存→テスト→成果物の順です。'
+    },
+    {
+        id: 16,
+        title: 'Coverage for Python',
+        description: 'Pythonテストの結果をカバレッジとして保存します。',
+        slots: 6,
+        availableBlocks: ['checkout', 'setup-python', 'pip-install', 'pytest', 'coverage-upload', 'upload-artifact'],
+        requiredBlocks: ['checkout', 'setup-python', 'pip-install', 'pytest', 'coverage-upload'],
+        solution: ['checkout', 'setup-python', 'pip-install', 'pytest', 'coverage-upload', 'upload-artifact'],
+        hint: 'pytest後にカバレッジをアップロードします。',
+        explanation: '言語に関わらず、テストの成果を可視化するのが継続的改善の鍵です。'
+    },
+    {
+        id: 17,
+        title: 'Speed Up CI',
+        description: 'キャッシュと通知で素早くフィードバックを返します。',
+        slots: 6,
+        availableBlocks: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-test', 'notify-slack'],
+        requiredBlocks: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-test'],
+        solution: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-test', 'notify-slack'],
+        hint: 'キャッシュを効かせてテストを早く回し、通知します。',
+        explanation: '高速フィードバックループを意識し、結果をチームに共有する流れを学びます。'
+    },
+    {
+        id: 18,
+        title: 'Secure Release',
+        description: 'スキャンと承認を挟んで安全にリリースします。',
+        slots: 7,
+        availableBlocks: ['checkout', 'security-scan', 'setup-node', 'npm-install', 'npm-build', 'manual-approval', 'deploy-production'],
+        requiredBlocks: ['checkout', 'security-scan', 'setup-node', 'npm-install', 'npm-build', 'manual-approval', 'deploy-production'],
+        solution: ['checkout', 'security-scan', 'setup-node', 'npm-install', 'npm-build', 'manual-approval', 'deploy-production'],
+        hint: 'スキャン→ビルド→承認→本番の順。',
+        explanation: 'セキュリティチェックと人の承認を通した上でリリースする安全重視のフローです。'
+    },
+    {
+        id: 19,
+        title: 'Matrix + Coverage',
+        description: '複数環境テストの後にカバレッジを集計します。',
+        slots: 6,
+        availableBlocks: ['checkout', 'setup-node', 'npm-install', 'matrix-test', 'coverage-upload', 'upload-artifact'],
+        requiredBlocks: ['checkout', 'setup-node', 'npm-install', 'matrix-test', 'coverage-upload'],
+        solution: ['checkout', 'setup-node', 'npm-install', 'matrix-test', 'coverage-upload', 'upload-artifact'],
+        hint: 'マトリクスでテストしてからカバレッジをアップロード。',
+        explanation: '並列実行の結果をまとめてカバレッジに反映させる想定です。'
+    },
+    {
+        id: 20,
+        title: 'Full Pipeline',
+        description: 'Lint・テスト・ビルド・デプロイ・通知までフルセットで流します。',
+        slots: 10,
+        availableBlocks: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-lint', 'npm-test', 'npm-build', 'upload-artifact', 'deploy-staging', 'notify-slack'],
+        requiredBlocks: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-lint', 'npm-test', 'npm-build', 'upload-artifact', 'deploy-staging'],
+        solution: ['checkout', 'setup-node', 'cache-node', 'npm-install', 'npm-lint', 'npm-test', 'npm-build', 'upload-artifact', 'deploy-staging', 'notify-slack'],
+        hint: 'キャッシュを効かせ、品質チェック後にビルド→デプロイ→通知の順。',
+        explanation: 'これまで学んだ要素をまとめて一連のパイプラインとして実行します。'
     }
-    */
 ];
