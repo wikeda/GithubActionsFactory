@@ -225,9 +225,7 @@ const UI = {
         this.clearConsole();
         this.log(`Loaded Level ${level.id}: ${level.title}`, 'info');
         this.log(level.description, 'info');
-        if (level.hint) {
-            this.log(`HINT: ${level.hint}`, 'warning');
-        }
+        this.logHint(level);
 
         this.updateStatus('READY');
     },
@@ -322,6 +320,27 @@ const UI = {
         line.textContent = `> ${message}`;
         this.elements.consoleContent.appendChild(line);
         this.elements.consoleContent.scrollTop = this.elements.consoleContent.scrollHeight;
+    },
+
+    /**
+     * Log hint based on attempt count
+     * 0回目: ヒントなし
+     * 1回目: ソフトヒント（汎用）
+     * 2回目以降: レベル固有ヒント
+     */
+    logHint: function (level) {
+        const stats = Storage.load().stats || {};
+        const attempts = stats[level.id]?.attempts || 0;
+
+        if (attempts === 0) return; // 初回はヒントなし
+        if (attempts === 1) {
+            this.log('HINT (soft): 順序と依存関係に気をつけて組み立ててみましょう。', 'warning');
+            return;
+        }
+
+        if (level.hint) {
+            this.log(`HINT: ${level.hint}`, 'warning');
+        }
     },
 
     clearConsole: function () {
