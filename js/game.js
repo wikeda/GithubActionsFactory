@@ -130,6 +130,11 @@ const Game = {
         UI.updateStatus('FAILED');
         UI.log(reason, 'error');
         UI.log('Build Failed.', 'error');
+
+        // Show hint based on attempts after a failure
+        if (this.currentLevel) {
+            UI.logHint(this.currentLevel);
+        }
     },
 
     validateSolution: function (config) {

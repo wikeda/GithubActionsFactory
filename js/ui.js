@@ -74,6 +74,22 @@ const UI = {
         this.elements.btnMapGlossary.addEventListener('click', () => {
             this.elements.glossaryModal.classList.remove('hidden');
         });
+
+        // ホームボタン（新規追加）
+        const btnHome = document.getElementById('btn-home');
+        if (btnHome) {
+            btnHome.addEventListener('click', () => {
+                this.showScreen('top-screen');
+            });
+        }
+
+        // ロゴクリックでTOP画面に遷移（新規追加）
+        const logoHome = document.getElementById('logo-home');
+        if (logoHome) {
+            logoHome.addEventListener('click', () => {
+                this.showScreen('top-screen');
+            });
+        }
     },
 
     showScreen: function (screenId) {
@@ -212,9 +228,10 @@ const UI = {
             this.elements.slotsContainer.appendChild(slot);
         }
 
-        // Render Palette
+        // Render Palette (randomize order each time)
         this.elements.blocksPalette.innerHTML = '';
-        level.availableBlocks.forEach(blockId => {
+        const paletteBlocks = this.shuffleArray(level.availableBlocks);
+        paletteBlocks.forEach(blockId => {
             const blockData = BLOCKS[blockId];
             if (blockData) {
                 const block = this.createBlockElement(blockData);
@@ -225,9 +242,7 @@ const UI = {
         this.clearConsole();
         this.log(`Loaded Level ${level.id}: ${level.title}`, 'info');
         this.log(level.description, 'info');
-        if (level.hint) {
-            this.log(`HINT: ${level.hint}`, 'warning');
-        }
+        this.logHint(level);
 
         this.updateStatus('READY');
     },
@@ -312,6 +327,18 @@ const UI = {
     },
 
     /**
+     * Return a shuffled copy of an array (Fisher-Yates)
+     */
+    shuffleArray: function (arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    },
+
+    /**
      * Log message to console
      * @param {string} message 
      * @param {string} type 'info' | 'success' | 'error' | 'warning'
@@ -322,6 +349,27 @@ const UI = {
         line.textContent = `> ${message}`;
         this.elements.consoleContent.appendChild(line);
         this.elements.consoleContent.scrollTop = this.elements.consoleContent.scrollHeight;
+    },
+
+    /**
+     * Log hint based on attempt count
+     * 0回目: ヒントなし
+     * 1回目: ソフトヒント（汎用）
+     * 2回目以降: レベル固有ヒント
+     */
+    logHint: function (level) {
+        const stats = Storage.load().stats || {};
+        const attempts = stats[level.id]?.attempts || 0;
+
+        if (attempts <= 1) return; // 初回（attempts=1）まではヒントなし
+        if (attempts === 2) {
+            this.log('HINT (soft): 順序と依存関係に気をつけて組み立ててみましょう。', 'warning');
+            return;
+        }
+
+        if (level.hint) {
+            this.log(`HINT: ${level.hint}`, 'warning');
+        }
     },
 
     clearConsole: function () {
