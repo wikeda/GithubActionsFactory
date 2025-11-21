@@ -343,12 +343,31 @@ body {
 .map-container {
     flex: 1;
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    padding: 40px;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px 40px;
     overflow-y: auto;
+}
+
+.level-category {
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--bg-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.category-title {
+    font-weight: 800;
+    color: var(--accent-primary);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.category-levels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .level-node {
@@ -392,6 +411,15 @@ body {
     font-size: 0.8rem;
     margin-top: 5px;
     color: var(--text-secondary);
+}
+
+.level-title-small {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    text-align: center;
+    padding: 0 6px;
+    line-height: 1.2;
 }
 
 .level-node.cleared .level-status {

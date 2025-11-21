@@ -98,30 +98,55 @@ const UI = {
         const data = Storage.load();
         const maxLevel = data.maxLevel;
 
+        // カテゴリ順序をLEVELSの記述順から抽出
+        const categories = [];
         LEVELS.forEach(level => {
-            const node = document.createElement('div');
-            node.className = 'level-node';
-
-            if (level.id < maxLevel) {
-                node.classList.add('cleared');
-            } else if (level.id > maxLevel) {
-                node.classList.add('locked');
+            if (!categories.includes(level.category)) {
+                categories.push(level.category);
             }
+        });
 
-            node.innerHTML = `
-                <div class="level-number">${String(level.id).padStart(2, '0')}</div>
-                <div class="level-status">
-                    ${level.id < maxLevel ? 'CLEARED' : (level.id === maxLevel ? 'NEXT' : 'LOCKED')}
-                </div>
-            `;
+        categories.forEach(category => {
+            const section = document.createElement('div');
+            section.className = 'level-category';
 
-            if (level.id <= maxLevel) {
-                node.addEventListener('click', () => {
-                    Game.startLevel(level.id);
-                });
-            }
+            const title = document.createElement('div');
+            title.className = 'category-title';
+            title.textContent = category;
+            section.appendChild(title);
 
-            container.appendChild(node);
+            const levelsWrap = document.createElement('div');
+            levelsWrap.className = 'category-levels';
+
+            LEVELS.filter(l => l.category === category).forEach(level => {
+                const node = document.createElement('div');
+                node.className = 'level-node';
+
+                if (level.id < maxLevel) {
+                    node.classList.add('cleared');
+                } else if (level.id > maxLevel) {
+                    node.classList.add('locked');
+                }
+
+                node.innerHTML = `
+                    <div class="level-number">${String(level.id).padStart(2, '0')}</div>
+                    <div class="level-status">
+                        ${level.id < maxLevel ? 'CLEARED' : (level.id === maxLevel ? 'NEXT' : 'LOCKED')}
+                    </div>
+                    <div class="level-title-small">${level.title}</div>
+                `;
+
+                if (level.id <= maxLevel) {
+                    node.addEventListener('click', () => {
+                        Game.startLevel(level.id);
+                    });
+                }
+
+                levelsWrap.appendChild(node);
+            });
+
+            section.appendChild(levelsWrap);
+            container.appendChild(section);
         });
     },
 

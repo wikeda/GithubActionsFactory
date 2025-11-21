@@ -6,6 +6,7 @@
 const LEVELS = [
     {
         id: 1,
+        category: 'ベーシック',
         title: 'Hello Workflow',
         description: 'まずは基本から。ソースコードを取得してテストを実行しましょう。',
         slots: 2,
@@ -17,6 +18,7 @@ const LEVELS = [
     },
     {
         id: 2,
+        category: 'ベーシック',
         title: 'Environment Setup',
         description: 'Node.jsのプロジェクトです。環境を作って依存関係を入れてからテストしましょう。',
         slots: 4,
@@ -28,6 +30,7 @@ const LEVELS = [
     },
     {
         id: 3,
+        category: 'ベーシック',
         title: 'Build & Release',
         description: 'テストが通ったらビルドして、成果物をアップロードしましょう。',
         slots: 5,
@@ -39,6 +42,7 @@ const LEVELS = [
     },
     {
         id: 4,
+        category: 'ベーシック',
         title: 'Lint & Test',
         description: 'Lintとテストを順に走らせて品質を担保します。',
         slots: 5,
@@ -50,6 +54,7 @@ const LEVELS = [
     },
     {
         id: 5,
+        category: '品質・効率化',
         title: 'Cache Dependencies',
         description: 'キャッシュを使って依存インストールを高速化しましょう。',
         slots: 5,
@@ -61,6 +66,7 @@ const LEVELS = [
     },
     {
         id: 6,
+        category: '品質・効率化',
         title: 'Coverage Upload',
         description: 'テスト後にカバレッジをアップロードしましょう。',
         slots: 6,
@@ -72,6 +78,7 @@ const LEVELS = [
     },
     {
         id: 7,
+        category: '品質・効率化',
         title: 'Matrix Testing',
         description: '複数環境でテストを並列実行して互換性を確認します。',
         slots: 5,
@@ -83,6 +90,7 @@ const LEVELS = [
     },
     {
         id: 8,
+        category: '品質・効率化',
         title: 'Security Scan',
         description: 'テスト前に脆弱性スキャンを入れて安全性を確認します。',
         slots: 5,
@@ -94,6 +102,7 @@ const LEVELS = [
     },
     {
         id: 9,
+        category: 'コンテナ・デプロイ',
         title: 'Docker Build',
         description: 'Dockerイメージをビルドしてみましょう。',
         slots: 3,
@@ -105,6 +114,7 @@ const LEVELS = [
     },
     {
         id: 10,
+        category: 'コンテナ・デプロイ',
         title: 'Push Container Image',
         description: 'レジストリにログインしてイメージをプッシュします。',
         slots: 4,
@@ -116,6 +126,7 @@ const LEVELS = [
     },
     {
         id: 11,
+        category: 'コンテナ・デプロイ',
         title: 'Deploy to Staging',
         description: 'ビルド成果物を作り、ステージングにデプロイします。',
         slots: 6,
@@ -127,6 +138,7 @@ const LEVELS = [
     },
     {
         id: 12,
+        category: 'コンテナ・デプロイ',
         title: 'Approval for Production',
         description: '本番デプロイ前に手動承認を挟みます。',
         slots: 6,
@@ -138,6 +150,7 @@ const LEVELS = [
     },
     {
         id: 13,
+        category: '拡張と再利用',
         title: 'Reusable Workflow',
         description: '共通化された再利用ワークフローを呼び出します。',
         slots: 3,
@@ -149,6 +162,7 @@ const LEVELS = [
     },
     {
         id: 14,
+        category: '拡張と再利用',
         title: 'Concurrency & Notify',
         description: '重複実行を防ぎつつ結果を通知します。',
         slots: 5,
@@ -160,6 +174,7 @@ const LEVELS = [
     },
     {
         id: 15,
+        category: '拡張と再利用',
         title: 'Python Tests',
         description: 'Pythonプロジェクトのテストパイプラインを作ります。',
         slots: 5,
@@ -171,6 +186,7 @@ const LEVELS = [
     },
     {
         id: 16,
+        category: '拡張と再利用',
         title: 'Coverage for Python',
         description: 'Pythonテストの結果をカバレッジとして保存します。',
         slots: 6,
@@ -182,6 +198,7 @@ const LEVELS = [
     },
     {
         id: 17,
+        category: '運用・総合',
         title: 'Speed Up CI',
         description: 'キャッシュと通知で素早くフィードバックを返します。',
         slots: 6,
@@ -193,6 +210,7 @@ const LEVELS = [
     },
     {
         id: 18,
+        category: '運用・総合',
         title: 'Secure Release',
         description: 'スキャンと承認を挟んで安全にリリースします。',
         slots: 7,
@@ -204,6 +222,7 @@ const LEVELS = [
     },
     {
         id: 19,
+        category: '運用・総合',
         title: 'Matrix + Coverage',
         description: '複数環境テストの後にカバレッジを集計します。',
         slots: 6,
@@ -215,6 +234,7 @@ const LEVELS = [
     },
     {
         id: 20,
+        category: '運用・総合',
         title: 'Full Pipeline',
         description: 'Lint・テスト・ビルド・デプロイ・通知までフルセットで流します。',
         slots: 10,
